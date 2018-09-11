@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='reveal',
       version='0.1',
@@ -6,5 +6,5 @@ setup(name='reveal',
       author='Kartikay Sharma',
       author_email='kartikay@colostate.edu',
       license='MIT',
-      packages=['reveal'],
+      packages=find_packages(),
       zip_safe=False)
