@@ -10,7 +10,7 @@ def _standardize_unstandardize(X):
         return stds * stdX + means
     return (standardize, unStandardize)
 
-def _standardize_train_test(partitions):
+def _standardize_train_test(partitions, classification = False):
 
     Xtrain, Ttrain, Xtest, Ttest = partitions
 
@@ -20,10 +20,12 @@ def _standardize_train_test(partitions):
     Xtrain = std_x(Xtrain)
     Xtest = std_x(Xtest)
 
-    Ttrain = std_t(Ttrain)
-    #Ttest = std_t(Ttest)
+    if classification:
+        return [Xtrain, Ttrain, Xtest, Ttest], None
+    else:
+        Ttrain = std_t(Ttrain)
+        return [Xtrain, Ttrain, Xtest, Ttest], unstd_t
 
-    return [Xtrain, Ttrain, Xtest, Ttest], unstd_t
 
 def _convertFromNumpy(data, data_type):
     converted = []
