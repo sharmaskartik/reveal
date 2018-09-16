@@ -90,19 +90,19 @@ def _standardize_train_test(partitions, classification = False):
 
 def _convertFromNumpy(list_of_np_arrays, tensor_type):
 
-        """
-          The function converts all numpy arrays in list_of_np_arrays into
-          tensors of type tensor_type
+    """
+      The function converts all numpy arrays in list_of_np_arrays into
+      tensors of type tensor_type
 
-          Usage: list_of_tensors = _convertFromNumpy(list_of_np_arrays, tensor_type):
+      Usage: list_of_tensors = _convertFromNumpy(list_of_np_arrays, tensor_type):
 
-          params:
-                list_of_np_arrays : a list of numpy arrays
-                tensor_type : datatype for result tensors
+      params:
+            list_of_np_arrays : a list of numpy arrays
+            tensor_type : datatype for result tensors
 
-          return
-                list_of_tensors : a list of tensors in same order as input
-          """
+      return
+            list_of_tensors : a list of tensors in same order as input
+      """
 
     converted = []
     for numpy_array in list_of_np_arrays:
