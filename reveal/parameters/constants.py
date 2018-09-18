@@ -1,7 +1,23 @@
+import numpy as np
+import torch.nn.functional as F
+
 #Network Strucure Types
 NETWORK_TYPE_FEEDFORWARD = 0
+ALL_NETWORK_TYPES = np.array([NETWORK_TYPE_FEEDFORWARD])
 
+#Problem Types
+PROBLEM_TYPE_REGRESSION = 0
+PROBLEM_TYPE_CLASSIFICATION = 1
 
-#Experiment Types
-EXPERIMENT_TYPE_REGRESSION = 0
-EXPERIMENT_TYPE_CLASSIFICATION = 1
+ALL_PROBLEM_TYPES = np.array([PROBLEM_TYPE_REGRESSION, PROBLEM_TYPE_CLASSIFICATION])
+
+#Activation Functions
+RELU = F.relu
+TANH = F.tanh
+SIGMOID = F.sigmoid
+
+ALL_ACTIVATION_FUNCTIONS = np.array([RELU, TANH, SIGMOID])
+
+#parameter validation constants
+VALIDATION_FAILED = -1
+VALIDATION_SUCCEEDED = 1

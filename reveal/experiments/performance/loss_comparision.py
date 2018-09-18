@@ -1,5 +1,6 @@
 import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
+import reveal.parameters.validator as validator
 
 from reveal.networks.feedforward import *
 
@@ -27,40 +28,10 @@ class LossComparision():
         self.params['optimizer'] = None
 
 
-    def _check_parameters(self):
-
-        stat = 0
-
-        if self.params['problem_type'] is None:
-            print("params['problem_type'] was not set")
-            stat = -1
-
-        if self.params['net_structures'] is None:
-            print("params['net_structures'] was not set")
-            stat = -1
-
-        if self.params['network_type'] is None:
-            print("params['network_type'] was not set")
-            stat = -1
-
-        if self.params['activations'] is None:
-            print("params['activations'] was not set")
-            stat = -1
-
-        if self.params['loss_function'] is None:
-            print("params['loss_function'] was not set")
-            stat = -1
-
-        if self.params['optimizer'] is None:
-            print("params['optimizer'] was not set")
-            stat = -1
-
-        return stat
-
     def compare_loss(self, X, T):
 
         #check if the parameters are valid
-        stat = self._check_parameters()
+        stat = validator._check_parameters(self.params)
 
         if stat < 0:
             return
