@@ -1,2 +1,2 @@
 from .TwoLayerFF import TwoLayerFF
-from .TwoLayerFF import ThreeLayerFF
+from .ThreeLayerFF import ThreeLayerFF

@@ -2,7 +2,8 @@ import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
 import reveal.parameters.validator as validator
 
-from reveal.networks.feedforward import *
+#from reveal.networks.feedforward import *
+import reveal.networks.resolve_network_factory as rnf
 
 import torch
 import torch.nn as nn
@@ -23,7 +24,7 @@ class LossComparision():
         self.params['problem_type'] = None
         self.params['net_structures'] = None
         self.params['network_type'] = None
-        self.params['activations'] = None
+        self.params['activation_fs'] = None
         self.params['loss_function'] = None
         self.params['optimizer'] = None
 
@@ -36,9 +37,19 @@ class LossComparision():
         if stat < 0:
             return
 
-        net = TwoLayerFF([X.shape[1],10,10,T.shape[1]], F.relu)
+        net_struc = self.params['net_structures'][1]
+
+        net_factory  = rnf.resolve_network_factory(self.params['network_type'])
+        net_class = net_factory(net_struc)
+        complete_net_struc = [X.shape[1]] + net_struc +[T.shape[1]]
+
+        activation_f = self.params['activation_fs'][1]
+
+        net = net_class(complete_net_struc, activation_f)
+
         criterion = nn.MSELoss()
         optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
         print(net)
 
         X, T = dp._convertFromNumpy([X, T], torch.FloatTensor)
