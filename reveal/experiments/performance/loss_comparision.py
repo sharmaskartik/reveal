@@ -1,7 +1,7 @@
 import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
 import reveal.parameters.validator as validator
-
+from reveal.util.verbosity import Verbosity
 #from reveal.networks.feedforward import *
 import reveal.networks.resolve_network_factory as rnf
 import reveal.parameters.constants as constants
@@ -41,6 +41,8 @@ class LossComparision():
 
     def compare_loss(self, X, T):
 
+        verbosity = Verbosity(self.params['verbosity'])
+
         #check if the parameters are valid
         stat = validator._check_parameters(self.params)
 
@@ -50,9 +52,10 @@ class LossComparision():
         criterion = nn.MSELoss()
         batch_size = self.params['batch_size']
 
-        print("*********************************")
-        print("Beginning Experiment")
-        print("*********************************")
+        verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                            "*********************************",
+                            "Beginning Experiment",
+                            "*********************************")
 
         X, T = dp._convertFromNumpy([X, T], torch.FloatTensor)
 
@@ -63,14 +66,16 @@ class LossComparision():
             net_class = net_factory(net_struc)
             complete_net_struc = [X.shape[1]] + net_struc +[T.shape[1]]
 
-            print("\n\n-------------------------")
-            print("Network Structure ", net_struc)
-            print("----------------------------\n\n")
+            verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                                "\n-------------------------",
+                                "Network Structure ", net_struc,
+                                "----------------------------\n")
 
             for repetition in range(self.params['repetition']):
 
-                print("Repetition ", repetition + 1)
-                print("\n\n----------------------------\n\n")
+                verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                                    "Repetition %i"%(repetition + 1),
+                                    "----------------------------\n")
 
                 #partition data for new structure*
                 #all activation functions will run on same partitions
@@ -88,8 +93,10 @@ class LossComparision():
 
                 for activation_f in self.params['activation_fs']:
 
-                    print("Activation Function ", activation_f)
-                    print("\n\n----------------------------\n\n")
+                    verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                                        "Activation Function %s"%str(activation_f),
+                                        "----------------------------\n")
+
 
                     net = net_class(complete_net_struc, activation_f)
                     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -120,21 +127,21 @@ class LossComparision():
 
                         #calculate testing error for epoch
                         loss_train = self.getLoss(optimizer, criterion, net, Xtrain, unstd_Ttrain, unstd_t)
-                        print("Training error for epoch %i : \t %i " %(epoch, loss_train))
+                        verbosity.print_msg(constants.VERBOSE_DETAILED_INFO , "Training error for epoch %i : \t %i " %(epoch, loss_train))
 
                         #calculate testing error for epoch
                         loss_test = self.getLoss(optimizer, criterion, net, Xtest, Ttest, unstd_t)
-                        print("Testing error for epoch %i : \t %i " %(epoch, loss_test))
+                        verbosity.print_msg(constants.VERBOSE_DETAILED_INFO , "Testing error for epoch %i : \t %i " %(epoch, loss_test),
+                                            "================================================\n")
 
-                        print("================================================\n")
 
                         #epoch loop ends here
 
-                print('Finished Training')
+                #print('Finished Training')
                 # activation function loop ends here
 
-            print('Finished Training')
+            #print('Finished Training')
             #repetition loop ends here
         # net_structures loop ends here
 
-        print('Finished Training')
+        #print('Finished Training')
