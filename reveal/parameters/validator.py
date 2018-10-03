@@ -69,30 +69,48 @@ def validate_net_structures(net_structures):
     else:
         return constants.VALIDATION_SUCCEEDED
 
+def validate_int_parameter(param, param_name):
+    if isinstance(param, int):
+        return constants.VALIDATION_SUCCEEDED
+    else:
+        print(param_name + " must be integer")
+        return constants.VALIDATION_FAILED
 
 
 def _check_parameters(params):
 
     statuses = []
 
-    stat = stat = validate_problem_type(params['problem_type'])
+    stat = validate_problem_type(params['problem_type'])
     statuses.append(stat)
 
-    stat = stat = validate_net_structures(params['net_structures'])
+    stat = validate_net_structures(params['net_structures'])
     statuses.append(stat)
 
-    stat = stat = validate_network_type(params['network_type'])
+    stat = validate_network_type(params['network_type'])
     statuses.append(stat)
 
-    stat = stat = validate_list_of_activavtion_functions(params['activation_fs'])
-    print(stat)
+    stat = validate_list_of_activavtion_functions(params['activation_fs'])
+
     statuses.append(stat)
 
-    stat = stat = validate_loss_function(params['loss_function'])
+    stat = validate_loss_function(params['loss_function'])
     statuses.append(stat)
 
-    stat = stat = validate_optimizer(params['optimizer'])
+    stat = validate_optimizer(params['optimizer'])
     statuses.append(stat)
+
+    stat = validate_int_parameter(params['repetition'],"params['repetition']")
+    statuses.append(stat)
+
+    stat = validate_int_parameter(params['batch_size'],"params['batch_size']")
+    statuses.append(stat)
+
+    stat = validate_int_parameter(params['epochs'],"params['epochs']")
+    statuses.append(stat)
+
+
+
 
     statuses = np.array(statuses)
     idxs = np.where(statuses == constants.VALIDATION_FAILED)[0]
