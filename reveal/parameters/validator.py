@@ -30,21 +30,21 @@ def validate_network_type(network_type):
         return constants.VALIDATION_FAILED
 
 
-def validate_list_of_activavtion_functions(list_of_activavtion_functions):
+def validate_list_of_activavtion_functions(list_of_activation_functions):
 
     status = constants.VALIDATION_SUCCEEDED
-    for i, activation_function in enumerate(list_of_activavtion_functions):
-        #check if activation_function is present in list of constants.ALL_ACTIVATION_FUNCTIONS
-        idxs = np.where(constants.ALL_ACTIVATION_FUNCTIONS == activation_function)[0]
-        #if it doesn't exist, length of idxs should be greater than 0
-        if len(idxs) == 0:
+    for i, activation_function in enumerate(list_of_activation_functions):
+        #check if activation_function is present in list of constants.activation_functions
+        val = constants.activation_functions.get(activation_function, -1)
+
+        #if it doesn't exist in the dictionary, val would be -1
+        if val == -1:
             status = constants.VALIDATION_FAILED
             print("Activation function: ", activation_function," at position ", i ," in params['activation_fs'] is not valid.")
 
     if status == constants.VALIDATION_FAILED:
         print("These should be one of the following")
-        print(constants.ALL_ACTIVATION_FUNCTIONS)
-        print("These are defined in reveal.parameters.constants.py")
+        print(list(constants.activation_functions.keys()))
 
     return status
 

@@ -12,11 +12,11 @@ PROBLEM_TYPE_CLASSIFICATION = 1
 ALL_PROBLEM_TYPES = np.array([PROBLEM_TYPE_REGRESSION, PROBLEM_TYPE_CLASSIFICATION])
 
 #Activation Functions
-RELU = F.relu
-TANH = F.tanh
-SIGMOID = F.sigmoid
+activation_functions = {}
+activation_functions["relu"] = F.relu
+activation_functions["tanh"] = F.tanh
+activation_functions["sigmoid"] = F.sigmoid
 
-ALL_ACTIVATION_FUNCTIONS = np.array([RELU, TANH, SIGMOID])
 
 #parameter validation constants
 VALIDATION_FAILED = -1

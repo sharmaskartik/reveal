@@ -2,7 +2,7 @@ import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
 import reveal.parameters.validator as validator
 from reveal.util.verbosity import Verbosity
-#from reveal.networks.feedforward import *
+from reveal.structures.loss_experiment_structure import LossExperimentResultStructure
 import reveal.networks.resolve_network_factory as rnf
 import reveal.parameters.constants as constants
 
@@ -36,10 +36,12 @@ class LossComparision():
         optimizer.zero_grad()
         output, _ = net(X.unsqueeze(0))
         output = unstd_t(output)
-        loss = criterion(output, T.unsqueeze(0)).item()
+        loss = criterion(output, T.unsqueeze(0))#.item()
         return loss
 
     def compare_loss(self, X, T):
+
+        results = LossExperimentResultStructure(self.params['net_structures'], self.params['repetition'], self.params['activation_fs'])
 
         verbosity = Verbosity(self.params['verbosity'])
 
@@ -52,55 +54,68 @@ class LossComparision():
         criterion = nn.MSELoss()
         batch_size = self.params['batch_size']
 
-        verbosity.print_msg(constants.VERBOSE_MED_INFO,
+        verbosity.print(constants.VERBOSE_MED_INFO,
                             "*********************************",
                             "Beginning Experiment",
                             "*********************************")
 
         X, T = dp._convertFromNumpy([X, T], torch.FloatTensor)
 
-        for i, net_struc in enumerate(self.params['net_structures']):
+        ###########################################################
+        #                LOOP FOR NETWORK STRUCTURES
+        ###########################################################
+
+        for n_net_struc, net_struc in enumerate(self.params['net_structures']):
 
             net_factory  = rnf.resolve_network_factory(self.params['network_type'])
-
             net_class = net_factory(net_struc)
             complete_net_struc = [X.shape[1]] + net_struc +[T.shape[1]]
 
-            verbosity.print_msg(constants.VERBOSE_MED_INFO,
+            verbosity.print(constants.VERBOSE_MED_INFO,
                                 "\n-------------------------",
                                 "Network Structure ", net_struc,
                                 "----------------------------\n")
 
+            ###########################################################
+            #                    LOOP FOR REPETITION
+            ###########################################################
             for repetition in range(self.params['repetition']):
 
-                verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                verbosity.print(constants.VERBOSE_MED_INFO,
                                     "Repetition %i"%(repetition + 1),
                                     "----------------------------\n")
 
-                #partition data for new structure*
+                #partition data for new structure
                 #all activation functions will run on same partitions
                 partitions = partition.partition(X, T, [0.8, 0.2], shuffle = True)
                 partitions, unstd_t = dp._standardize_train_test(partitions)
                 Xtrain, Ttrain, Xtest, Ttest = partitions
 
                 if self.params['problem_type'] == constants.PROBLEM_TYPE_REGRESSION:
-                    #un_standardized Ttrain is required to calculate the MSE after each epoch
+                    #un_standardized Ttrain is required to calculate the training loss after each epoch
                     unstd_Ttrain = unstd_t(copy.copy(Ttrain))
                 else:
                     unstd_Ttrain = Ttrain
 
                 n_train_samples = Xtrain.size()[0]
 
+                ###########################################################
+                #            LOOP FOR ACTIVATION FUNCTIONS
+                ###########################################################
                 for activation_f in self.params['activation_fs']:
 
-                    verbosity.print_msg(constants.VERBOSE_MED_INFO,
+                    verbosity.print(constants.VERBOSE_MED_INFO,
                                         "Activation Function %s"%str(activation_f),
                                         "----------------------------\n")
 
 
-                    net = net_class(complete_net_struc, activation_f)
+                    net = net_class(complete_net_struc, constants.activation_functions[activation_f])
                     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
+
+                    ###########################################################
+                    #                        LOOP FOR EPOCHS
+                    ###########################################################
                     for epoch in range(self.params['epochs']):  # loop over the dataset multiple times
 
                         running_loss = 0.0
@@ -121,22 +136,26 @@ class LossComparision():
                             loss.backward()
                             optimizer.step()
 
-                            # print statistics
-                            running_loss += loss.item()
-                        running_loss = 0.0
-
                         #calculate testing error for epoch
                         loss_train = self.getLoss(optimizer, criterion, net, Xtrain, unstd_Ttrain, unstd_t)
-                        verbosity.print_msg(constants.VERBOSE_DETAILED_INFO , "Training error for epoch %i : \t %i " %(epoch, loss_train))
 
                         #calculate testing error for epoch
                         loss_test = self.getLoss(optimizer, criterion, net, Xtest, Ttest, unstd_t)
-                        verbosity.print_msg(constants.VERBOSE_DETAILED_INFO , "Testing error for epoch %i : \t %i " %(epoch, loss_test),
+
+                        if epoch == 0:
+                            losses = torch.FloatTensor((loss_train, loss_test)).view(-1, 2)
+                        else:
+                            losses = torch.cat((losses, torch.FloatTensor((loss_train, loss_test)).view(-1, 2)))
+
+                        verbosity.print(constants.VERBOSE_DETAILED_INFO , "Training error for epoch %i : \t %i " %(epoch, loss_train))
+
+                        verbosity.print(constants.VERBOSE_DETAILED_INFO , "Testing error for epoch %i : \t %i " %(epoch, loss_test),
                                             "================================================\n")
+                    #epoch loop ends here
 
 
-                        #epoch loop ends here
 
+                    results.update_results(n_net_struc, repetition, activation_f, losses)
                 #print('Finished Training')
                 # activation function loop ends here
 
@@ -145,3 +164,4 @@ class LossComparision():
         # net_structures loop ends here
 
         #print('Finished Training')
+        results.print_results(verbosity)
