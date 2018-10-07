@@ -153,15 +153,20 @@ class LossComparision():
                                             "================================================\n")
                     #epoch loop ends here
 
-
-
                     results.update_results(n_net_struc, repetition, activation_f, losses)
-                #print('Finished Training')
+
+                    #print('Activation function done')
+
                 # activation function loop ends here
 
-            #print('Finished Training')
+                #print('Repetition done')
             #repetition loop ends here
+
+
+            #print('net structure done')
         # net_structures loop ends here
 
-        #print('Finished Training')
         results.print_results(verbosity)
+        #print("training finished")
+        return results
+        #end of method
