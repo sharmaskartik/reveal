@@ -2,9 +2,10 @@ import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
 import reveal.parameters.validator as validator
 from reveal.util.verbosity import Verbosity
-from reveal.structures.loss_experiment_structure import LossExperimentResultStructure
+from reveal.structures.loss_experiment_structure import LossExperimentResults
 import reveal.networks.resolve_network_factory as rnf
 import reveal.parameters.constants as constants
+
 
 import torch
 import torch.nn as nn
@@ -20,7 +21,7 @@ class LossComparision():
         super(LossComparision, self).__init__()
 
         self.params = {}
-        self.params['repetition'] = 10
+        self.params['repetitions'] = 10
         self.params['epochs'] = 10
         self.params['batch_size'] = 10
         self.params['verbosity'] = constants.VERBOSE_MIN_INFO
@@ -41,7 +42,7 @@ class LossComparision():
 
     def compare_loss(self, X, T):
 
-        results = LossExperimentResultStructure(self.params['net_structures'], self.params['repetition'], self.params['activation_fs'])
+        results = LossExperimentResults(net_structures = self.params['net_structures'], repetitions = self.params['repetitions'], activation_fs =self.params['activation_fs'])
 
         verbosity = Verbosity(self.params['verbosity'])
 
@@ -79,7 +80,7 @@ class LossComparision():
             ###########################################################
             #                    LOOP FOR REPETITION
             ###########################################################
-            for repetition in range(self.params['repetition']):
+            for repetition in range(self.params['repetitions']):
 
                 verbosity.print(constants.VERBOSE_MED_INFO,
                                     "Repetition %i"%(repetition + 1),

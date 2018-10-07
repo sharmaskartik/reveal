@@ -100,7 +100,7 @@ def _check_parameters(params):
     stat = validate_optimizer(params['optimizer'])
     statuses.append(stat)
 
-    stat = validate_int_parameter(params['repetition'],"params['repetition']")
+    stat = validate_int_parameter(params['repetitions'],"params['repetitions']")
     statuses.append(stat)
 
     stat = validate_int_parameter(params['batch_size'],"params['batch_size']")
