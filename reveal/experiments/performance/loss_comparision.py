@@ -2,7 +2,7 @@ import reveal.data_utils.partition_data as partition
 import reveal.data_utils.data_processor as dp
 import reveal.parameters.validator as validator
 from reveal.util.verbosity import Verbosity
-from reveal.structures.loss_experiment_structure import LossExperimentResults
+from reveal.structures.loss_experiment_structure import LossExperimentResultsAllReps
 import reveal.networks.resolve_network_factory as rnf
 import reveal.parameters.constants as constants
 
@@ -42,7 +42,7 @@ class LossComparision():
 
     def compare_loss(self, X, T):
 
-        results = LossExperimentResults(net_structures = self.params['net_structures'], repetitions = self.params['repetitions'], activation_fs =self.params['activation_fs'])
+        results = LossExperimentResultsAllReps(net_structures = self.params['net_structures'], repetitions = self.params['repetitions'], activation_fs =self.params['activation_fs'])
 
         verbosity = Verbosity(self.params['verbosity'])
 

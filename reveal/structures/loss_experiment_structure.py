@@ -3,11 +3,11 @@ from reveal.util.verbosity import Verbosity
 import torch
 import reveal.util.io as io
 
-class LossExperimentResults():
+class LossExperimentResultsAllReps():
 
     def __init__(self, *args, **kwargs):
 
-        super(LossExperimentResults, self).__init__()
+        super(LossExperimentResultsAllReps, self).__init__()
 
         obj = kwargs.get("obj", None)
 
@@ -41,7 +41,7 @@ class LossExperimentResults():
 
 
 
-        self.read_me = ' This is an object of class LossExperimentResults \n\
+        self.read_me = ' This is an object of class LossExperimentResultsAllReps \n\
         Members: \n \
         net_structures: List of Network Structures in the experiment \n \
         activation_fs: List of activation_f Functions in the experiment \n \

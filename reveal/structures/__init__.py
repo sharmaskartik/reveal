@@ -1,2 +1,2 @@
-from .loss_experiment_structure import LossExperimentResults
+from .loss_experiment_structure import LossExperimentResultsAllReps
 from .loss_experiment_structure import LossExperimentResultsMean
