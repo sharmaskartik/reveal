@@ -45,14 +45,11 @@ class LossExperimentResults():
         repetitions: # of time each combination was run as an independent experiment \n \
         \n\
         results: A dictionary of dictionaries of losses for each combination organised as \n \
-        {"net_structure_index": {"dictionary_of_reuslts_for_this_network_structure"}} \n\
+        {"net_structure_index": {"dictionary_of_results_for_this_network_structure"}} \n\
         \n\
-        dictionary_of_reuslts_for_network_structure = \n\
-        {"#repetition : dictionary_of_results_for_this repetition"}\n\
-        \n\
-        dictionary_of_reuslts_for_repetition = \n\
-        {"activation_function : "all" : r X n X 2 array of losses" \n\
-                                "means": n X 2 array of mean of losses}\n\
+        dictionary_of_results_for_network_structure = \n\
+        {"activation_function : "all" : r X n X 2 tensor of losses" \n\
+                                "means": n X 2 tensor of mean of losses}\n\
         where r is # repetitions and n is #epochs\n\
         col 0 are training losses and col 1 is losses on test set\n\
         '
