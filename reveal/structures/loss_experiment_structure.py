@@ -12,11 +12,11 @@ class LossExperimentResults():
         obj = kwargs.get("obj", None)
 
         if obj is None:
-            self.net_structures = kwargs.get("net_structures", None)
+            self.net_structures = self.convert_networks_to_strings(kwargs.get("net_structures", None))
             self.activation_fs = kwargs.get("activation_fs", None)
             self.repetitions = kwargs.get("repetitions", None)
             self.results = {}
-
+            self.convert_networks_to_strings(self.net_structures)
             if self.net_structures is None:
                 raise Exception('LossExperimentResultsMean constructor called without net_structures')
 
@@ -27,10 +27,10 @@ class LossExperimentResults():
                 raise Exception('LossExperimentResultsMean constructor called without repetition')
 
             #initialize the results dictionaries
-            for i, net_structure in enumerate(self.net_structures):
-                self.results[i] = {}
+            for net_structure in self.net_structures:
+                self.results[net_structure] = {}
                 for activation_f in self.activation_fs:
-                    self.results[i][activation_f] = { "all": None, "mean": None}
+                    self.results[net_structure][activation_f] = { "all": None, "mean": None}
         else:
             self.net_structures = obj["net_structures"]
             self.activation_fs = obj["activation_fs"]
@@ -56,7 +56,9 @@ class LossExperimentResults():
 
 
 
-    def update_results(self, net_structure, repetition, activation_f, losses):
+    def update_results(self, net_structure_idx, repetition, activation_f, losses):
+
+        net_structure = self.net_structures[net_structure_idx]
 
         losses = losses.unsqueeze(0)
         results = self.results[net_structure][activation_f].get("all", None)
@@ -68,7 +70,7 @@ class LossExperimentResults():
 
     def print_results(self, verbosity = Verbosity(constants.VERBOSE_DETAILED_INFO)):
 
-        for i, net_structure in enumerate(self.net_structures):
+        for net_structure in self.net_structures:
             verbosity.print(constants.VERBOSE_DETAILED_INFO,
             "=======================================",
             net_structure,
@@ -79,17 +81,34 @@ class LossExperimentResults():
                 "\t\t"+activation_f,
                 "\t\t------------------------------------------------",
                 "\t\t All ",
-                self.results[i][activation_f]["all"].size(),
+                self.results[net_structure][activation_f]["all"].size(),
                 "\t\t Means ",
-                self.results[i][activation_f]["means"].size())
+                self.results[net_structure][activation_f]["means"].size())
 
     def calculate_means(self):
-        for i, net_structure in enumerate(self.net_structures):
+        for net_structure in self.net_structures:
             for activation_f in self.activation_fs:
-                self.results[i][activation_f]["means"] = torch.mean(self.results[i][activation_f]["all"], dim = 0)
+                self.results[net_structure][activation_f]["means"] = torch.mean(self.results[net_structure][activation_f]["all"], dim = 0)
 
     def save(self, filePath):
         io.save(filePath, self.__dict__)
 
     def load(self, filePath):
         return io.load(filePath)
+
+    def convert_networks_to_strings(self, networks):
+
+        '''
+        function converts networks (a list of lists of elements) to a list of strings
+        '''
+        if networks is None:
+            return None
+
+        network_names = []
+
+        for network in networks:
+            name = ", ".join(str(i) for i in network)
+            name = "[" + name + "]"
+            network_names.append(name)
+
+        return network_names

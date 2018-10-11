@@ -37,7 +37,7 @@ class LossComparision():
         optimizer.zero_grad()
         output, _ = net(X.unsqueeze(0))
         output = unstd_t(output)
-        loss = criterion(output, T.unsqueeze(0))#.item()
+        loss = criterion(output, T.unsqueeze(0))
         return loss
 
     def compare_loss(self, X, T):
@@ -109,8 +109,10 @@ class LossComparision():
                                         "Activation Function %s"%str(activation_f),
                                         "----------------------------\n")
 
-
+                    #create network object
                     net = net_class(complete_net_struc, constants.activation_functions[activation_f])
+
+                    #initiatilize optimizer
                     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
@@ -126,6 +128,7 @@ class LossComparision():
                             else:
                                 end = i + batch_size
 
+                            # add a dimention for batch
                             X_iter = Xtrain[i:end,:].unsqueeze(0)
                             T_iter = Ttrain[i:end,:].unsqueeze(0)
                             # zero the parameter gradients
@@ -166,6 +169,7 @@ class LossComparision():
 
             #print('net structure done')
         # net_structures loop ends here
+
         results.calculate_means()
         results.print_results(verbosity)
         #print("training finished")
