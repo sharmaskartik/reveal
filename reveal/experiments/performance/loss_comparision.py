@@ -42,7 +42,9 @@ class LossComparision():
 
     def compare_loss(self, X, T):
 
-        results = LossExperimentResults(net_structures = self.params['net_structures'], repetitions = self.params['repetitions'], activation_fs =self.params['activation_fs'])
+        results = LossExperimentResults(net_structures = self.params['net_structures'],
+                    repetitions = self.params['repetitions'],
+                    activation_fs =self.params['activation_fs'])
 
         verbosity = Verbosity(self.params['verbosity'])
 
@@ -70,6 +72,11 @@ class LossComparision():
 
             net_factory  = rnf.resolve_network_factory(self.params['network_type'])
             net_class = net_factory(net_struc)
+
+            if net_class is None:
+                raise Exception("Network for the network structure :", net_struc,
+                 " has not been defined in the package")
+
             complete_net_struc = [X.shape[1]] + net_struc +[T.shape[1]]
 
             verbosity.print(constants.VERBOSE_MED_INFO,
