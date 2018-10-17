@@ -115,6 +115,4 @@ def _check_parameters(params):
     statuses = np.array(statuses)
     idxs = np.where(statuses == constants.VALIDATION_FAILED)[0]
     if len(idxs) > 0:
-        return constants.VALIDATION_FAILED
-    else:
-        return constants.VALIDATION_SUCCEEDED
+        raise Exception("Incorrect Parameters were used. Please check above...")

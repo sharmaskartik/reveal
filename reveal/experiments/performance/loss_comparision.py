@@ -40,7 +40,7 @@ class LossComparision():
         loss = criterion(output, T.unsqueeze(0))
         return loss
 
-    def compare_loss(self, X, T):
+    def _init_variables(self):
 
         results = LossExperimentResults(net_structures = self.params['net_structures'],
                     repetitions = self.params['repetitions'],
@@ -48,20 +48,25 @@ class LossComparision():
 
         verbosity = Verbosity(self.params['verbosity'])
 
-        #check if the parameters are valid
-        stat = validator._check_parameters(self.params)
-
-        if stat < 0:
-            return
-
         criterion = nn.MSELoss()
         batch_size = self.params['batch_size']
+
+        return results, verbosity, criterion, batch_size
+
+    def compare_loss(self, X, T):
+
+        #initiatilize results, verbosity, criterion objects
+        results, verbosity, criterion, batch_size = self._init_variables()
+
+        #check if the parameters are valid
+        validator._check_parameters(self.params)
 
         verbosity.print(constants.VERBOSE_MED_INFO,
                             "*********************************",
                             "Beginning Experiment",
                             "*********************************")
 
+        #Convert numpy arrays to Tensors
         X, T = dp._convertFromNumpy([X, T], torch.FloatTensor)
 
         ###########################################################
@@ -70,18 +75,18 @@ class LossComparision():
 
         for n_net_struc, net_struc in enumerate(self.params['net_structures']):
 
+            #resolve network factory based on network type
             net_factory  = rnf.resolve_network_factory(self.params['network_type'])
+
+            #create network object using the factory
             net_class = net_factory(net_struc)
 
-            if net_class is None:
-                raise Exception("Network for the network structure :", net_struc,
-                 " has not been defined in the package")
-
+            # add input layer and ouput layer to hidden layers
             complete_net_struc = [X.shape[1]] + net_struc +[T.shape[1]]
 
             verbosity.print(constants.VERBOSE_MED_INFO,
                                 "\n-------------------------",
-                                "Network Structure ", net_struc,
+                                "Network Structure: \t" + str(net_struc),
                                 "----------------------------\n")
 
             ###########################################################
@@ -90,10 +95,11 @@ class LossComparision():
             for repetition in range(self.params['repetitions']):
 
                 verbosity.print(constants.VERBOSE_MED_INFO,
-                                    "Repetition %i"%(repetition + 1),
-                                    "----------------------------\n")
+                                    "Repetition: %i"%(repetition + 1),
+                                    "----------------------------\n",
+                                    tabs = 1)
 
-                #partition data for new structure
+                #partition data for current net structure
                 #all activation functions will run on same partitions
                 partitions = partition.partition(X, T, [0.8, 0.2], shuffle = True)
                 partitions, unstd_t = dp._standardize_train_test(partitions)
@@ -113,8 +119,9 @@ class LossComparision():
                 for activation_f in self.params['activation_fs']:
 
                     verbosity.print(constants.VERBOSE_MED_INFO,
-                                        "Activation Function %s"%str(activation_f),
-                                        "----------------------------\n")
+                                        "Activation Function: %s"%str(activation_f),
+                                        "============================\n",
+                                        tabs = 2)
 
                     #create network object
                     net = net_class(complete_net_struc, constants.activation_functions[activation_f])
@@ -147,10 +154,10 @@ class LossComparision():
                             loss.backward()
                             optimizer.step()
 
-                        #calculate testing error for epoch
+                        #calculate testing error after training on  current epoch
                         loss_train = self.getLoss(optimizer, criterion, net, Xtrain, unstd_Ttrain, unstd_t)
 
-                        #calculate testing error for epoch
+                        #calculate testing error  after training on current epoch
                         loss_test = self.getLoss(optimizer, criterion, net, Xtest, Ttest, unstd_t)
 
                         if epoch == 0:
@@ -158,10 +165,14 @@ class LossComparision():
                         else:
                             losses = torch.cat((losses, torch.FloatTensor((loss_train, loss_test)).view(-1, 2)))
 
-                        verbosity.print(constants.VERBOSE_DETAILED_INFO , "Training error for epoch %i : \t %i " %(epoch, loss_train))
+                        verbosity.print(constants.VERBOSE_DETAILED_INFO ,
+                                        "Training error for epoch %i : \t %i " %(epoch, loss_train),
+                                        tabs = 3)
 
-                        verbosity.print(constants.VERBOSE_DETAILED_INFO , "Testing error for epoch %i : \t %i " %(epoch, loss_test),
-                                            "================================================\n")
+                        verbosity.print(constants.VERBOSE_DETAILED_INFO ,
+                                        "Testing error for epoch %i : \t %i " %(epoch, loss_test),
+                                        "================================================\n",
+                                        tabs = 3)
                     #epoch loop ends here
 
                     results.update_results(n_net_struc, repetition, activation_f, losses)

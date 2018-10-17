@@ -70,20 +70,34 @@ class LossExperimentResults():
 
     def print_results(self, verbosity = Verbosity(constants.VERBOSE_DETAILED_INFO)):
 
+
+        verbosity.print(constants.VERBOSE_DETAILED_INFO,
+                        "\n\n***************************************",
+                        "Loss Comparision Results",
+                        "***************************************\n")
+
         for net_structure in self.net_structures:
+
             verbosity.print(constants.VERBOSE_DETAILED_INFO,
-            "=======================================",
-            net_structure,
-            "=======================================")
+                            "\n=======================================",
+                            net_structure,
+                            "=======================================")
+
             for activation_f in self.activation_fs:
+
                 verbosity.print(constants.VERBOSE_DETAILED_INFO,
-                "\t\t------------------------------------------------",
-                "\t\t"+activation_f,
-                "\t\t------------------------------------------------",
-                "\t\t All ",
-                self.results[net_structure][activation_f]["all"].size(),
-                "\t\t Means ",
-                self.results[net_structure][activation_f]["means"].size())
+                            "\n------------------------------------------------",
+                            ""+activation_f,
+                            "------------------------------------------------\n",
+                            tabs = 1)
+
+
+                verbosity.print(constants.VERBOSE_DETAILED_INFO,
+                                "\nAll ",
+                                self.results[net_structure][activation_f]["all"],
+                                "\n\nMeans ",
+                                self.results[net_structure][activation_f]["means"],
+                                tabs = 3)
 
     def calculate_means(self):
         for net_structure in self.net_structures:

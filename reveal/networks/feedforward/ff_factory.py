@@ -8,4 +8,10 @@ structures = {
 }
 
 def factory(structure):
-    return structures.get(len(structure), None)
+    net_class = structures.get(len(structure), None)
+
+    if net_class is None:
+        raise Exception("Network for the network structure :", structure,
+         " has not been defined in the package")
+
+    return net_class
