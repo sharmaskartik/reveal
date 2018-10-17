@@ -32,6 +32,7 @@ class LossComparision():
         self.params['activation_fs'] = None
         self.params['loss_function'] = None
         self.params['optimizer'] = None
+        self.params['use_cuda'] = False
 
     def getLoss(self, optimizer, criterion, net, X, T, unstd_t):
         optimizer.zero_grad()
@@ -67,7 +68,7 @@ class LossComparision():
                             "*********************************")
 
         #Convert numpy arrays to Tensors
-        X, T = dp._convertFromNumpy([X, T], torch.FloatTensor)
+        X, T = dp._convertFromNumpy([X, T], torch.FloatTensor, self.params['use_cuda'])
 
         ###########################################################
         #                LOOP FOR NETWORK STRUCTURES

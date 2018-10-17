@@ -88,7 +88,7 @@ def _standardize_train_test(partitions, classification = False):
     return [Xtrain, Ttrain, Xtest, Ttest], unstd_t
 
 
-def _convertFromNumpy(list_of_np_arrays, tensor_type):
+def _convertFromNumpy(list_of_np_arrays, tensor_type, use_cuda = False):
 
     """
       The function converts all numpy arrays in list_of_np_arrays into
@@ -99,6 +99,7 @@ def _convertFromNumpy(list_of_np_arrays, tensor_type):
       params:
             list_of_np_arrays : a list of numpy arrays
             tensor_type : datatype for result tensors
+            use_cuda: boolean flag to execute on GPU
 
       return
             list_of_tensors : a list of tensors in same order as input
@@ -106,5 +107,9 @@ def _convertFromNumpy(list_of_np_arrays, tensor_type):
 
     converted = []
     for numpy_array in list_of_np_arrays:
-        converted.append(torch.from_numpy(numpy_array).type(tensor_type))
+        torch_tensor = torch.from_numpy(numpy_array).type(tensor_type)
+
+        if torch.cuda.is_available() and use_cuda:
+            torch_tensor = torch_tensor.cuda()
+        converted.append(torch_tensor)
     return converted
