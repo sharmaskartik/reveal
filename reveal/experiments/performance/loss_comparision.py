@@ -127,6 +127,10 @@ class LossComparision():
                     #create network object
                     net = net_class(complete_net_struc, constants.activation_functions[activation_f])
 
+                    #put net on GPU is self.params['use_cuda' is true]
+                    if torch.cuda.is_available() and self.params['use_cuda']:
+                        net = net.cuda()
+
                     #initiatilize optimizer
                     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
